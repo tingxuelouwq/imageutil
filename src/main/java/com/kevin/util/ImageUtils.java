@@ -3,7 +3,7 @@ package com.kevin.util;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Position;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -43,6 +45,21 @@ public class ImageUtils {
     /** 随机数生成器 **/
     private static final Random rnd = new Random();
 
+    /** 水印位置映射表 **/
+    private static final Map<Integer, Positions> positionMap = new HashMap<>();
+
+    static {
+        positionMap.put(1, Positions.TOP_LEFT);
+        positionMap.put(2, Positions.TOP_CENTER);
+        positionMap.put(3, Positions.TOP_RIGHT);
+        positionMap.put(4, Positions.CENTER_LEFT);
+        positionMap.put(5, Positions.CENTER);
+        positionMap.put(6, Positions.CENTER_RIGHT);
+        positionMap.put(7, Positions.BOTTOM_LEFT);
+        positionMap.put(8, Positions.BOTTOM_CENTER);
+        positionMap.put(9, Positions.BOTTOM_RIGHT);
+    }
+
     /**
      * @方法名：getSize
      * @作者：kevin
@@ -52,14 +69,9 @@ public class ImageUtils {
      * @return int[]
      */
     public static int[] getSize(String src) {
-        File image = null;
         BufferedImage bufferedImage = null;
         try {
-            image = new File(src);
-            if (!image.exists()) {
-                return null;
-            }
-            bufferedImage = ImageIO.read(image);
+            bufferedImage = ImageIO.read(new File(src));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -165,9 +177,22 @@ public class ImageUtils {
      * @param desHeight 目标图片高度
      * @return void
      */
-    public static void clip(String src, String des, Position position, int width, int height, int desWidth, int desHeight) {
+    public static void clip(String src, String des, int position,
+                            int width, int height, int desWidth, int desHeight) {
+        if (!checkPosition(position)) {
+            log.error("请检查水印位置, position: {}", position);
+            return;
+        }
+
         try {
-            Thumbnails.of(src).sourceRegion(position, width, height).size(desWidth, desHeight).keepAspectRatio(false).toFile(des);
+            if (position == 0) {    // 如果position为0，则定义随机位置
+                position = rnd.nextInt(9) + 1;
+            }
+            Thumbnails.of(src)
+                    .sourceRegion(positionMap.get(position), width, height)
+                    .size(desWidth, desHeight)
+                    .keepAspectRatio(false)
+                    .toFile(des);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -190,7 +215,9 @@ public class ImageUtils {
      * @param desHeight 目标图片高度
      * @return void
      */
-    public static void clip(String src, String des, int x, int y, int width, int height, int desWidth, int desHeight) {
+    public static void clip(String src, String des,
+                            int x, int y, int width, int height,
+                            int desWidth, int desHeight) {
         try {
             Thumbnails.of(src).sourceRegion(x, y, width, height).size(desWidth, desHeight).keepAspectRatio(false).toFile(des);
         } catch (IOException e) {
@@ -230,9 +257,20 @@ public class ImageUtils {
      * @return void
      */
     public static void watermark(String src, String des, double scale,
-                                 Position position, String watermark, float opacity) {
+                                 int position, String watermark, float opacity) {
+        if (!checkPosition(position)) {
+            log.error("请检查水印位置, position: {}", position);
+            return;
+        }
+
         try {
-            Thumbnails.of(src).scale(scale).watermark(position, ImageIO.read(new File(watermark)), opacity).toFile(des);
+            if (position == 0) {    // 如果position为0，则定义随机位置
+                position = rnd.nextInt(9) + 1;
+            }
+            Thumbnails.of(src)
+                    .scale(scale)
+                    .watermark(positionMap.get(position), ImageIO.read(new File(watermark)), opacity)
+                    .toFile(des);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -246,7 +284,7 @@ public class ImageUtils {
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
-     * @param position 水印图片位置，1-9分别表示TOP_LEFT、TOP_CENTER、TOP_RIGHT、CENTER_LEFT、CENTER_CENTER、CENTER_RIGHT、BOTTOM_LEFT、BOTTOM_CENTER、BOTTOM_RIGHT，0表示随机位置
+     * @param position 水印图片位置
      * @param text 水印文字
      * @param fontName 字体
      * @param fontStyle 字体样式
@@ -258,25 +296,23 @@ public class ImageUtils {
      * @return void
      * @exception
      */
-    public static void watermark(String src, String des, double scale, int position,
-                                 String text, String fontName, int fontStyle, int fontSize, String fontColor,
+    public static void watermark(String src, String des, double scale, int position, String text,
+                                 String fontName, int fontStyle, int fontSize, String fontColor,
                                  int outlineSize, String outlineColor,
                                  float opacity) {
-        File imageFile = new File(src);
-        if (!imageFile.exists()) {
-            log.error("目标路径文件不存在, des: {}", des);
-            return;
-        }
-
-        if (position < 0 || position > 9) {
-            log.error("水印文字位置取值为[0-9], position: {}", position);
+        if (!checkPosition(position)) {
+            log.error("请检查水印位置, position: {}", position);
             return;
         }
 
         OutputStream os = null;
         try {
-            Image image = ImageIO.read(imageFile);
+            if (position == 0) {    // 如果position为0，则定义随机位置
+                position = rnd.nextInt(9) + 1;
+            }
+
             // 原图的尺寸
+            Image image = ImageIO.read(new File(src));
             int width = image.getWidth(null);
             int height = image.getHeight(null);
 
@@ -296,7 +332,7 @@ public class ImageUtils {
             g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);    // 不改变几何结构
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, opacity));   // 设置透明度
 
-            int[] coordinates = getCoordinates(width, height, text, markWidth, markHeight, position);   // 获取水印文字位置
+            double[] coordinates = getCoordinates(width, height, markWidth, markHeight, 0, 0, 0, 0, position);   // 获取水印文字位置
             FontRenderContext fontRenderContext = g.getFontRenderContext(); // 获取文字渲染上下文
             TextLayout textLayout = new TextLayout(text, new Font(fontName, fontStyle, fontSize), fontRenderContext);   // 设置水印文字样式
             Shape shape = textLayout.getOutline(AffineTransform.getTranslateInstance(coordinates[0], coordinates[1] + fontSize));   // 获取水印文字轮廓信息
@@ -425,43 +461,45 @@ public class ImageUtils {
         length = ((length % 2 == 0) ? (length / 2) : (length / 2 + 1));
         return length;
     }
-
     /**
      * @方法名：getCoordinates
      * @作者：kevin[wangqi2017@xinhua.org]
-     * @时间：2017/8/4 10:23
+     * @时间：2017/8/5 11:15
      * @描述：获取水印文字在原图中的位置
      * @param width 原图宽度
      * @param height 原图高度
-     * @param text 水印文字
      * @param markWidth 水印文字宽度
      * @param markHeight 水印文字高度
-     * @param position 水印位置值
-     * @return int[] 水印位置坐标
+     * @param insetLeft 左边距
+     * @param insetRight 右边距
+     * @param insetTop 上边距
+     * @param insetBottom 下边距
+     * @param position 水印位置
+     * @return double[]
      * @exception
      */
-    private static int[] getCoordinates(int width, int height, String text, int markWidth, int markHeight, int position) {
-        if (position == 0) {
-            position = rnd.nextInt(9) + 1;
+    private static double[] getCoordinates(int width, int height,
+                                           int markWidth, int markHeight, int insetLeft, int insetRight,
+                                           int insetTop, int insetBottom, int position) {
+        Positions positions = positionMap.get(position);
+        Point point = positions.calculate(width, height, markWidth, markHeight, insetLeft, insetRight, insetTop, insetBottom);
+        return new double[]{point.getX(), point.getY()};
+    }
+
+    /**
+     * @方法名：checkPosition
+     * @作者：kevin[wangqi2017@xinhua.org]
+     * @时间：2017/8/5 10:32
+     * @描述：检查水印位置合法性
+     * @param position
+     * @return boolean
+     * @exception
+     */
+    private static boolean checkPosition(int position) {
+        if (position < 0 || position > 9) {
+            return false;
         }
-
-        // 获取水印文字在原图中的左上角坐标：分别将原图的width和height均分为3份，然后按照position进行相应移动
-        int x = (width / 3) * ((position - 1) % 3);
-        int y = (height / 3) * ((position - 1) / 3);
-
-        // 计算水印文字的尺寸和原图尺寸的差距
-        int widthDif = width - markWidth;
-        int heightDif = height - markHeight;
-
-        // 判断原图打上水印文字后，是否会超出原图大小
-        if (x > widthDif) {
-            x = widthDif;
-        }
-        if (y > heightDif) {
-            y = heightDif;
-        }
-
-        return new int[]{x, y};
+        return true;
     }
 
     public static void main(String[] args) {
@@ -470,7 +508,6 @@ public class ImageUtils {
         String watermark = "C:\\Users\\kevin\\Desktop\\images\\logo.png";
         System.out.println(ImageUtils.getSize(src)[0]);  // 640
         System.out.println(ImageUtils.getSize(src)[1]);  // 320
-//        watermark(src, des, 1.0, Positions.CENTER_LEFT, watermark, 0.8f);
 //        convert(src, des, 1.0, "png");
         watermark(src, des, 1.0, 9, "hello world", "Console", Font.BOLD, 40, "#B22222", 5, "#ADFF2F", 0.3f);
     }
