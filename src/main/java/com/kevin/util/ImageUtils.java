@@ -48,7 +48,7 @@ public class ImageUtils {
     /** 水印位置映射表 **/
     private static final Map<Integer, Positions> positionMap = new HashMap<>();
 
-    static {
+    static {    // 初始化水印位置映射表
         positionMap.put(1, Positions.TOP_LEFT);
         positionMap.put(2, Positions.TOP_CENTER);
         positionMap.put(3, Positions.TOP_RIGHT);
@@ -332,10 +332,10 @@ public class ImageUtils {
             g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);    // 不改变几何结构
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, opacity));   // 设置透明度
 
-            double[] coordinates = getCoordinates(width, height, markWidth, markHeight, 0, 0, 0, 0, position);   // 获取水印文字位置
+            double[] coordinates = getCoordinates(width, height, markWidth, markHeight, 20, 20, 20, 20, position);   // 获取水印文字位置
             FontRenderContext fontRenderContext = g.getFontRenderContext(); // 获取文字渲染上下文
             TextLayout textLayout = new TextLayout(text, new Font(fontName, fontStyle, fontSize), fontRenderContext);   // 设置水印文字样式
-            Shape shape = textLayout.getOutline(AffineTransform.getTranslateInstance(coordinates[0], coordinates[1] + fontSize));   // 获取水印文字轮廓信息
+            Shape shape = textLayout.getOutline(AffineTransform.getTranslateInstance(coordinates[0], coordinates[1] + fontSize));   // 获取水印文字轮廓信息，注：g.drawString(x,y)中的坐标指的是左下角坐标
             if (outlineSize >= 0 && !StringUtils.isEmpty(outlineColor)) {  // 设置轮廓
                 g.setStroke(new BasicStroke(outlineSize));
                 g.setColor(Color.decode(outlineColor));
@@ -509,6 +509,6 @@ public class ImageUtils {
         System.out.println(ImageUtils.getSize(src)[0]);  // 640
         System.out.println(ImageUtils.getSize(src)[1]);  // 320
 //        convert(src, des, 1.0, "png");
-        watermark(src, des, 1.0, 9, "hello world", "Console", Font.BOLD, 40, "#B22222", 5, "#ADFF2F", 0.3f);
+        watermark(src, des, 1.0, 9, "新华社", "Console", Font.BOLD, 40, "#B22222", 5, "#ADFF2F", 0.3f);
     }
 }
