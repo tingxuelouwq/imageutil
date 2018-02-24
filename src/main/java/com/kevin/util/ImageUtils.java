@@ -1,7 +1,5 @@
 package com.kevin.util;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.slf4j.Logger;
@@ -21,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @类名：ImageUtils
@@ -42,10 +41,14 @@ public class ImageUtils {
     private static final int SCALE_TYPE_MIN = 3;
     private static final int SCALE_TYPE_MAX = 4;
 
-    /** 随机数生成器 **/
-    private static final Random rnd = new Random();
+    /**
+     * 随机数生成器
+     **/
+    private static final Random rnd = ThreadLocalRandom.current();
 
-    /** 水印位置映射表 **/
+    /**
+     * 水印位置映射表
+     **/
     private static final Map<Integer, Positions> positionMap = new HashMap<>();
 
     static {    // 初始化水印位置映射表
@@ -60,13 +63,14 @@ public class ImageUtils {
         positionMap.put(9, Positions.BOTTOM_RIGHT);
     }
 
+    private ImageUtils() {
+        // no constructor function
+    }
+
     /**
-     * @方法名：getSize
-     * @作者：kevin
-     * @时间：2017/8/3 22:03
-     * @描述：获取图片的宽度和高度
+     * 获取图片的宽度和高度
      * @param src
-     * @return int[]
+     * @return
      */
     public static int[] getSize(String src) {
         BufferedImage bufferedImage = null;
@@ -82,16 +86,14 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：scale
-     * @作者：kevin
-     * @时间：2017/8/3 22:57
-     * @描述：按照指定的长宽缩放图片，维持原长宽比不变
+     * 按照指定的长宽缩放图片，维持原长宽比不变
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param width 缩放后的图片宽度
      * @param height 缩放后的图片高度
      * @param scaleType 缩放类型，取值为SCALE_TYPE_WIDTH(按宽度缩放)、SCALE_TYPE_HEIGHT(按高度缩放)、SCALE_TYPE_MIN(按比例小的缩放)、SCALE_TYPE_MAX(按比例大的缩放)
      * @return void
+     * @
      */
     public static void scale(String src, String des, int width, int height, int scaleType) {
         try {
@@ -127,10 +129,7 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：scale
-     * @作者：kevin
-     * @时间：2017/8/3 23:44
-     * @描述：按照指定的长宽缩放图片，不维持原长宽比不变
+     * 按照指定的长宽缩放图片，不维持原长宽比不变
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param width 缩放后的图片宽度
@@ -146,10 +145,7 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：scale
-     * @作者：kevin
-     * @时间：2017/8/3 23:49
-     * @描述：按指定的缩放比例缩放图片，维持原长宽比不变
+     * 按指定的缩放比例缩放图片，维持原长宽比不变
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
@@ -164,10 +160,7 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：clip
-     * @作者：kevin
-     * @时间：2017/8/4 0:03
-     * @描述：裁剪图片
+     * 裁剪图片
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param position 裁剪位置
@@ -199,16 +192,11 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：clip
-     * @作者：kevin
-     * @时间：2017/8/4 0:09
-     * @描述：裁剪图片
+     * 裁剪图片
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param x 裁剪区域左上角横坐标
      * @param y 裁剪区域左上角纵坐标
-     * @param width 裁剪区域宽度
-     * @param height 裁剪区域高度
      * @param width 裁剪区域宽度
      * @param height 裁剪区域高度
      * @param desWidth 目标图片宽度
@@ -226,10 +214,7 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：rotate
-     * @作者：kevin
-     * @时间：2017/8/4 0:17
-     * @描述：缩放并旋转图片
+     * 缩放并旋转图片
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
@@ -243,11 +228,9 @@ public class ImageUtils {
             e.printStackTrace();
         }
     }
+
     /**
-     * @方法名：watermark
-     * @作者：kevin
-     * @时间：2017/8/4 0:42
-     * @描述：打图片水印
+     * 打图片水印
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
@@ -277,14 +260,11 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：watermark
-     * @作者：kevin[wangqi2017@xinhua.org]
-     * @时间：2017/8/4 10:41
-     * @描述：打文字水印
+     * 打文字水印
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
-     * @param position 水印图片位置
+     * @param position 水印位置
      * @param text 水印文字
      * @param fontName 字体
      * @param fontStyle 字体样式
@@ -294,7 +274,6 @@ public class ImageUtils {
      * @param outlineColor 边框颜色
      * @param opacity 水印透明度
      * @return void
-     * @exception
      */
     public static void watermark(String src, String des, double scale, int position, String text,
                                  String fontName, int fontStyle, int fontSize, String fontColor,
@@ -305,7 +284,6 @@ public class ImageUtils {
             return;
         }
 
-        OutputStream os = null;
         try {
             if (position == 0) {    // 如果position为0，则定义随机位置
                 position = rnd.nextInt(9) + 1;
@@ -325,7 +303,7 @@ public class ImageUtils {
             // 2、创建绘图工具对象
             Graphics2D g = bufferedImage.createGraphics();
             // 3、使用绘图工具对象将原图绘制到缓存图片对象
-            g.drawImage(image, 0, 0, (int)(width * scale), (int)(height * scale), null);
+            g.drawImage(image, 0, 0, (int) (width * scale), (int) (height * scale), null);
 
             // 4、设置文字水印信息
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // 去锯齿
@@ -346,29 +324,15 @@ public class ImageUtils {
             // 5、销毁绘图工具对象
             g.dispose();
 
-            os = new FileOutputStream(des);
-            // 6、创建图像编码工具类
-            JPEGImageEncoder en = JPEGCodec.createJPEGEncoder(os);
-            ///7、使用图片编码工具类，输出图片缓存对象到目标图片文件
-            en.encode(bufferedImage);
+            // 输出图片缓存对象到目标图片文件
+            ImageIO.write(bufferedImage, "jpeg", new File(des));
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if(os!=null){
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     /**
-     * @方法名：convert
-     * @作者：kevin
-     * @时间：2017/8/4 0:42
-     * @描述：转换图片格式
+     * 转换图片格式
      * @param src 原图片路径
      * @param des 目标图片路径，后缀需要与目标图片格式一致，否则会自动添加目标图片格式作为后缀
      * @param scale 缩放比例
@@ -384,10 +348,7 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：getOutputStream
-     * @作者：kevin
-     * @时间：2017/8/4 0:51
-     * @描述：输出图片到OutputStream
+     * 输出图片到OutputStream
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
@@ -405,10 +366,7 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：getBufferedImage
-     * @作者：kevin
-     * @时间：2017/8/4 0:53
-     * @描述：输出图片到BufferedImage
+     * 输出图片到BufferedImage
      * @param src 原图片路径
      * @param des 目标图片路径
      * @param scale 缩放比例
@@ -426,10 +384,7 @@ public class ImageUtils {
 
 
     /**
-     * @方法名：getScale
-     * @作者：kevin
-     * @时间：2017/8/3 22:48
-     * @描述：获取num1/num2的比例
+     * 获取num1/num2的比例
      * @param num1
      * @param num2
      * @return double
@@ -442,13 +397,9 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：getTextLength
-     * @作者：kevin[wangqi2017@xinhua.org]
-     * @时间：2017/8/3 10:47
-     * @描述：获取文本长度，汉字为1:1，英文和数字为2:1
+     * 获取文本长度，汉字为1:1，英文和数字为2:1
      * @param text
      * @return int
-     * @exception
      */
     private static int getTextLength(String text) {
         int length = text.length();
@@ -461,11 +412,9 @@ public class ImageUtils {
         length = ((length % 2 == 0) ? (length / 2) : (length / 2 + 1));
         return length;
     }
+
     /**
-     * @方法名：getCoordinates
-     * @作者：kevin[wangqi2017@xinhua.org]
-     * @时间：2017/8/5 11:15
-     * @描述：获取水印文字在原图中的位置
+     * 获取水印文字在原图中的位置
      * @param width 原图宽度
      * @param height 原图高度
      * @param markWidth 水印文字宽度
@@ -476,7 +425,6 @@ public class ImageUtils {
      * @param insetBottom 下边距
      * @param position 水印位置
      * @return double[]
-     * @exception
      */
     private static double[] getCoordinates(int width, int height,
                                            int markWidth, int markHeight, int insetLeft, int insetRight,
@@ -487,28 +435,14 @@ public class ImageUtils {
     }
 
     /**
-     * @方法名：checkPosition
-     * @作者：kevin[wangqi2017@xinhua.org]
-     * @时间：2017/8/5 10:32
-     * @描述：检查水印位置合法性
+     * 检查水印位置合法性
      * @param position
      * @return boolean
-     * @exception
      */
     private static boolean checkPosition(int position) {
         if (position < 0 || position > 9) {
             return false;
         }
         return true;
-    }
-
-    public static void main(String[] args) {
-        String src = "C:\\Users\\kevin\\Desktop\\images\\国家大剧院.jpg";
-        String des = "C:\\Users\\kevin\\Desktop\\images\\国家大剧院_修.jpg";
-        String watermark = "C:\\Users\\kevin\\Desktop\\images\\logo.png";
-        System.out.println(ImageUtils.getSize(src)[0]);  // 640
-        System.out.println(ImageUtils.getSize(src)[1]);  // 320
-//        convert(src, des, 1.0, "png");
-        watermark(src, des, 1.0, 9, "新华社", "Console", Font.BOLD, 40, "#B22222", 5, "#ADFF2F", 0.3f);
     }
 }

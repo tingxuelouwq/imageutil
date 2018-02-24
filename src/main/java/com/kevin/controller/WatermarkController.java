@@ -39,7 +39,7 @@ public class WatermarkController {
 //    @Qualifier("imageMarkService")
 //    @Qualifier("MultiTextMarkService")
 //    @Qualifier("MultiImageMarkService")
-    @Qualifier("ImageMarkServiceThirdPart")
+    @Qualifier("ImageMarkServiceThirdParty")
     private MarkService markService;
 
     @RequestMapping("/watermark")

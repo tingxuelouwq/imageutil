@@ -43,7 +43,7 @@ public class TextMarkServiceImpl implements MarkService {
 
             // 设置水印文字字体信息
             g.setFont(new Font(FONT_NAME, FONT_STYLE, FONT_SIZE));
-            // 设置水印文字言责
+            // 设置水印文字颜色
             g.setColor(FONT_COLOR);
 
             int markWidth = FONT_SIZE * getTextLength(MARK_TEXT);
