@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="watermark:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="image-utils.war">
-      <element id="artifact" artifact-name="watermark:war exploded" />
-    </root>
-  </artifact>
-</component>
