@@ -38,7 +38,7 @@ public interface MarkService {
     float ALPHA = 0.3F;
 
     /** 水印图片*/
-    String LOGO = "logo.png";
+    String  LOGO = "logo.png";
 
     /**
      * @方法名：watermark

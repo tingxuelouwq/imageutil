@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="imageutil" />
         <module name="watermark" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="imageutil" target="1.8" />
       <module name="watermark" target="1.8" />
     </bytecodeTargetLevel>
   </component>
